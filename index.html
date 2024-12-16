@@ -1,88 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Leitor da Bíblia</title>
+  <title>Palavra Divina</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <style>
-    /* Estilos CSS para a aparência do leitor */
     body, html {
-      height: 100%;  /* Define altura do body e html para 100% */
-      margin: 0;     /* Remove margens padrão */
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
     }
 
     body {
-      font-family: sans-serif;
+      font-family: 'Lora', serif;
       display: flex;
       flex-direction: column;
-      background-color: #f4f4f4;
+      background: #f4f4f4;
+      color: #333;
+      overflow-y: auto;
     }
 
     .container {
       background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       text-align: center;
-      flex-grow: 1; /* Container ocupa o espaço disponível */
-      display: flex;
-      flex-direction: column;
+      max-width: 800px;
+      width: 90%;
+      margin: 30px auto;
     }
 
     h1 {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .menu-inicial {
+    .menu-inicial, #texto, .navegacao {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-grow: 1; /* Menu inicial ocupa o espaço disponível */
     }
 
-    select {
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      width: 100%;
-      max-width: 300px;
-      box-sizing: border-box;
+    .menu-inicial {
+      flex-grow: 1;
+      gap: 20px;
     }
 
     #texto {
-      margin-top: 20px;
+      flex-grow: 1;
       text-align: justify;
-      white-space: pre-wrap;
       font-size: 1.2em;
       line-height: 1.6;
-      overflow-y: auto; /* Adiciona barra de rolagem vertical */
-      flex-grow: 1;     /* Texto ocupa o espaço disponível */
+      overflow-y: auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 20px;
     }
 
     #texto .versiculo {
       display: block;
       margin-bottom: 10px;
+      text-indent: 2em;
     }
 
     #texto .versiculo:before {
       content: attr(data-versiculo) ": ";
       font-weight: bold;
       margin-right: 5px;
+      text-indent: -2em;
+      position: absolute;
+      margin-left: -2em;
+    }
+
+    #texto h2 {
+      font-size: 1.5em;
+      margin-top: 30px;
+      color: #007bff;
     }
 
     .destaque {
-      background-color: yellow;
+      background-color: #ffffe0;
       padding: 0.2em;
       border-radius: 0.2em;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     }
 
     .navegacao {
       margin-top: 20px;
-      display: flex;
-      justify-content: space-between; /* Distribui os botões com espaço entre eles */
-      width: 100%;
+      gap: 10px;
+      display: none;
     }
 
     .navegacao button {
@@ -93,8 +105,14 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 1em;
-      flex-grow: 1;
-      margin: 0 5px;
+      width: 100%;
+      max-width: 300px;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .navegacao button:hover {
+      background-color: #0056b3;
     }
 
     .navegacao button:disabled {
@@ -102,10 +120,38 @@
       cursor: default;
     }
 
+    select {
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+      font-size: 1em;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"#333\"><path d=\"M7 10l5 5 5-5z\"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px 12px;
+      padding-right: 30px;
+    }
+
+    .creditos {
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 20px;
+    }
+
     /* Estilos para telas menores (celulares) */
     @media (max-width: 600px) {
       .container {
         padding: 10px;
+        margin: 20px auto;
+      }
+
+      h1 {
+        font-size: 2em;
       }
 
       select {
@@ -114,6 +160,7 @@
 
       #texto {
         font-size: 1em;
+        padding: 10px;
       }
 
       .navegacao button {
@@ -125,7 +172,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Leitor da Bíblia</h1>
+    <h1>Palavra Divina</h1>
 
     <div class="menu-inicial">
       <div>
@@ -135,22 +182,27 @@
 
       <div>
         <label for="capitulos">Capítulo:</label>
-        <select id="capitulos"></select>
+        <select id="capitulos">
+          <option value="">Todos</option>
+        </select>
       </div>
 
       <div>
         <label for="versiculos">Versículo:</label>
-        <select id="versiculos"></select>
+        <select id="versiculos">
+          <option value="">-</option>
+        </select>
       </div>
 
       <button id="btnConfirmar" onclick="exibirTexto()">Ler</button>
+      <p class="creditos">Criado por Ronan Alles</p>
     </div>
 
     <div id="texto"></div>
 
     <div class="navegacao">
-      <button id="btnAnterior" onclick="capituloAnterior()">Capítulo Anterior</button>
-      <button id="btnProximo" onclick="proximoCapitulo()">Próximo Capítulo</button>
+      <button id="btnAnterior" onclick="capituloAnterior()" disabled>Capítulo Anterior</button>
+      <button id="btnProximo" onclick="proximoCapitulo()" disabled>Próximo Capítulo</button>
     </div>
   </div>
 
