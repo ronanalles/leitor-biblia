@@ -6,15 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* Estilos CSS para a aparência do leitor */
+    body, html {
+      height: 100%;  /* Define altura do body e html para 100% */
+      margin: 0;     /* Remove margens padrão */
+    }
+
     body {
       font-family: sans-serif;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
       background-color: #f4f4f4;
-      margin: 0;
     }
 
     .container {
@@ -23,12 +24,21 @@
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       text-align: center;
-      max-width: 800px;
-      width: 90%;
+      flex-grow: 1; /* Container ocupa o espaço disponível */
+      display: flex;
+      flex-direction: column;
     }
 
     h1 {
       margin-bottom: 20px;
+    }
+
+    .menu-inicial {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1; /* Menu inicial ocupa o espaço disponível */
     }
 
     select {
@@ -47,6 +57,8 @@
       white-space: pre-wrap;
       font-size: 1.2em;
       line-height: 1.6;
+      overflow-y: auto; /* Adiciona barra de rolagem vertical */
+      flex-grow: 1;     /* Texto ocupa o espaço disponível */
     }
 
     #texto .versiculo {
@@ -69,7 +81,7 @@
     .navegacao {
       margin-top: 20px;
       display: flex;
-      justify-content: center; /* Centraliza os botões */
+      justify-content: space-between; /* Distribui os botões com espaço entre eles */
       width: 100%;
     }
 
@@ -81,8 +93,8 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 1em;
-      flex-grow: 1; /* Faz os botões ocuparem todo o espaço disponível */
-      margin: 0 5px; /* Espaçamento entre os botões */
+      flex-grow: 1;
+      margin: 0 5px;
     }
 
     .navegacao button:disabled {
@@ -93,20 +105,20 @@
     /* Estilos para telas menores (celulares) */
     @media (max-width: 600px) {
       .container {
-        padding: 10px; /* Reduz o padding em telas pequenas */
+        padding: 10px;
       }
 
       select {
-        font-size: 16px; /* Ajusta o tamanho da fonte do menu */
+        font-size: 16px;
       }
 
       #texto {
-        font-size: 1em; /* Ajusta o tamanho da fonte do texto */
+        font-size: 1em;
       }
 
       .navegacao button {
-        font-size: 0.9em; /* Ajusta o tamanho da fonte dos botões */
-        padding: 8px 15px; /* Reduz o padding dos botões */
+        font-size: 0.9em;
+        padding: 8px 15px;
       }
     }
   </style>
@@ -115,22 +127,24 @@
   <div class="container">
     <h1>Leitor da Bíblia</h1>
 
-    <div>
-      <label for="livros">Livro:</label>
-      <select id="livros"></select>
-    </div>
+    <div class="menu-inicial">
+      <div>
+        <label for="livros">Livro:</label>
+        <select id="livros"></select>
+      </div>
 
-    <div>
-      <label for="capitulos">Capítulo:</label>
-      <select id="capitulos"></select>
-    </div>
+      <div>
+        <label for="capitulos">Capítulo:</label>
+        <select id="capitulos"></select>
+      </div>
 
-    <div>
-      <label for="versiculos">Versículo:</label>
-      <select id="versiculos"></select>
-    </div>
+      <div>
+        <label for="versiculos">Versículo:</label>
+        <select id="versiculos"></select>
+      </div>
 
-    <button id="btnConfirmar" onclick="exibirTexto()">Ler</button>
+      <button id="btnConfirmar" onclick="exibirTexto()">Ler</button>
+    </div>
 
     <div id="texto"></div>
 
