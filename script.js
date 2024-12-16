@@ -12,11 +12,11 @@ function carregarBiblia(caminhoArquivo) {
         biblia[nomeLivro] = {};
         for (let i = 0; i < livro.chapters.length; i++) {
           const capitulo = livro.chapters[i];
-          const numCapitulo = i + 1; // Números dos capítulos começam em 1
+          const numCapitulo = i + 1;
           biblia[nomeLivro][numCapitulo] = {};
           for (let j = 0; j < capitulo.length; j++) {
             const versiculo = capitulo[j];
-            const numVersiculo = j + 1; // Números dos versículos começam em 1
+            const numVersiculo = j + 1;
             biblia[nomeLivro][numCapitulo][numVersiculo] = versiculo;
           }
         }
@@ -27,24 +27,19 @@ function carregarBiblia(caminhoArquivo) {
     })
     .catch(error => {
       console.error('Erro ao carregar o arquivo JSON:', error);
-      // Lidar com o erro de carregamento (exibir mensagem para o usuário, etc.)
+      alert('Erro ao carregar a Bíblia. Por favor, tente novamente mais tarde.');
     });
 }
 
 // Função para inicializar a interface do usuário
 function inicializarInterface() {
-  // Popula os selects de livros, capítulos e versículos
   popularLivros();
   popularCapitulos();
   popularVersiculos();
 
-  // Inicializa as variáveis de controle de navegação
   livroAtual = document.getElementById('livros').value;
-  capituloAtual = document.getElementById('capitulos').value;
+  capituloAtual = 1;
   versiculoAtual = document.getElementById('versiculos').value;
-
-  // Desabilita o botão "Capítulo Anterior" inicialmente
-  document.getElementById('btnAnterior').disabled = true;
 }
 
 // Função para popular o select de livros
@@ -56,14 +51,18 @@ function popularLivros() {
     option.text = livro;
     livrosSelect.add(option);
   }
-  livrosSelect.addEventListener('change', popularCapitulos);
+  livrosSelect.addEventListener('change', () => {
+    popularCapitulos();
+    document.getElementById('capitulos').selectedIndex = 0;
+    document.getElementById('versiculos').selectedIndex = 0;
+  });
 }
 
 // Função para popular o select de capítulos
 function popularCapitulos() {
   const livro = document.getElementById('livros').value;
   const capitulosSelect = document.getElementById('capitulos');
-  capitulosSelect.innerHTML = ''; // Limpa as opções existentes
+  capitulosSelect.innerHTML = '<option value="">Todos</option>';
 
   if (biblia[livro]) {
     for (const capitulo in biblia[livro]) {
@@ -81,9 +80,9 @@ function popularVersiculos() {
   const livro = document.getElementById('livros').value;
   const capitulo = document.getElementById('capitulos').value;
   const versiculosSelect = document.getElementById('versiculos');
-  versiculosSelect.innerHTML = ''; // Limpa as opções existentes
+  versiculosSelect.innerHTML = '<option value="">-</option>';
 
-  if (biblia[livro] && biblia[livro][capitulo]) {
+  if (biblia[livro] && capitulo && biblia[livro][capitulo]) {
     const numVersiculos = Object.keys(biblia[livro][capitulo]).length;
     for (let i = 1; i <= numVersiculos; i++) {
       const option = document.createElement('option');
@@ -100,29 +99,38 @@ function exibirTexto() {
   const capitulo = document.getElementById('capitulos').value;
   const versiculo = document.getElementById('versiculos').value;
   const textoDiv = document.getElementById('texto');
+  const navegacaoDiv = document.querySelector('.navegacao');
   const btnAnterior = document.getElementById('btnAnterior');
   const btnProximo = document.getElementById('btnProximo');
 
-  if (biblia[livro] && biblia[livro][capitulo]) {
-    // Atualiza as variáveis de controle de navegação
+  if (biblia[livro]) {
     livroAtual = livro;
-    capituloAtual = parseInt(capitulo, 10); // Converte para número
+    capituloAtual = capitulo ? parseInt(capitulo, 10) : 1;
     versiculoAtual = versiculo;
 
-    // Exibe o capítulo completo
-    let textoCapitulo = '';
-    for (const v in biblia[livro][capitulo]) {
-      const versiculoTexto = biblia[livro][capitulo][v];
-      const classeDestaque = (v === versiculo) ? 'destaque' : '';
-      textoCapitulo += `<span class="versiculo ${classeDestaque}" data-versiculo="${v}">${versiculoTexto}</span>`;
+    let textoLivro = '';
+    if (capitulo) {
+      for (const v in biblia[livro][capitulo]) {
+        const versiculoTexto = biblia[livro][capitulo][v];
+        const classeDestaque = (v === versiculo) ? 'destaque' : '';
+        textoLivro += `<span class="versiculo ${classeDestaque}" data-versiculo="${v}"><span class="numero-versiculo">${v}: </span>${versiculoTexto}</span>`;
+      }
+    } else {
+      // Exibe apenas o primeiro capítulo do livro
+      const primeiroCapitulo = Object.keys(biblia[livro])[0];
+      textoLivro = `<h2>Capítulo ${primeiroCapitulo}</h2>`;
+      for (const v in biblia[livro][primeiroCapitulo]) {
+        const versiculoTexto = biblia[livro][primeiroCapitulo][v];
+        textoLivro += `<span class="versiculo" data-versiculo="${v}"><span class="numero-versiculo">${v}: </span>${versiculoTexto}</span>`;
+      }
+      capituloAtual = parseInt(primeiroCapitulo, 10);
     }
-    textoDiv.innerHTML = textoCapitulo;
 
-    // Habilita os botões de navegação
+    textoDiv.innerHTML = textoLivro;
+    navegacaoDiv.style.display = 'flex';
     btnAnterior.disabled = false;
     btnProximo.disabled = false;
 
-    // Atualiza o texto dos botões de navegação
     atualizarBotoesNavegacao();
   } else {
     textoDiv.textContent = 'Texto não encontrado.';
@@ -134,22 +142,19 @@ function capituloAnterior() {
   const livrosSelect = document.getElementById('livros');
   const capitulosSelect = document.getElementById('capitulos');
 
-  let capituloAnterior = capituloAtual - 1;
-  if (capituloAnterior > 0) {
-    // Ainda há capítulos anteriores no livro atual
-    capitulosSelect.selectedIndex = capituloAnterior - 1; // Índice começa em 0
-    capituloAtual = capituloAnterior;
+  if (capituloAtual > 1) {
+    capituloAtual--;
+    capitulosSelect.selectedIndex = capituloAtual;
     exibirTexto();
   } else {
-    // Navega para o último capítulo do livro anterior
     let livroAnteriorIndex = livrosSelect.selectedIndex - 1;
     if (livroAnteriorIndex >= 0) {
       livrosSelect.selectedIndex = livroAnteriorIndex;
-      capitulosSelect.selectedIndex = capitulosSelect.options.length - 1; // Último capítulo
-      capituloAtual = parseInt(capitulosSelect.value, 10); // Converte para número
+      popularCapitulos();
+      capituloAtual = Object.keys(biblia[livrosSelect.value]).length;
+      capitulosSelect.selectedIndex = capituloAtual;
       exibirTexto();
     } else {
-      // Já está no primeiro capítulo do primeiro livro
       alert('Você já está no início da Bíblia.');
     }
   }
@@ -162,24 +167,20 @@ function proximoCapitulo() {
   const livrosSelect = document.getElementById('livros');
   const capitulosSelect = document.getElementById('capitulos');
 
-  let proximoCapitulo = capituloAtual + 1;
   let numCapitulos = Object.keys(biblia[livroAtual]).length;
-
-  if (proximoCapitulo <= numCapitulos) {
-    // Ainda há próximos capítulos no livro atual
-    capitulosSelect.selectedIndex = proximoCapitulo - 1; // Índice começa em 0
-    capituloAtual = proximoCapitulo;
+  if (capituloAtual < numCapitulos) {
+    capituloAtual++;
+    capitulosSelect.selectedIndex = capituloAtual;
     exibirTexto();
   } else {
-    // Navega para o primeiro capítulo do próximo livro
     let proximoLivroIndex = livrosSelect.selectedIndex + 1;
     if (proximoLivroIndex < livrosSelect.options.length) {
       livrosSelect.selectedIndex = proximoLivroIndex;
-      capitulosSelect.selectedIndex = 0; // Primeiro capítulo
-      capituloAtual = parseInt(capitulosSelect.value, 10); // Converte para número
+      popularCapitulos();
+      capituloAtual = 1; // Define como primeiro capítulo do próximo livro
+      capitulosSelect.selectedIndex = 1; // índice 1 por causa da opção "Todos"
       exibirTexto();
     } else {
-      // Já está no último capítulo do último livro
       alert('Você já está no fim da Bíblia.');
     }
   }
@@ -190,36 +191,27 @@ function proximoCapitulo() {
 // Função para atualizar o texto dos botões de navegação
 function atualizarBotoesNavegacao() {
   const livrosSelect = document.getElementById('livros');
-  const capitulosSelect = document.getElementById('capitulos');
   const btnAnterior = document.getElementById('btnAnterior');
   const btnProximo = document.getElementById('btnProximo');
 
-  let proximoCapitulo = capituloAtual + 1;
   let numCapitulos = Object.keys(biblia[livroAtual]).length;
 
-  if (proximoCapitulo <= numCapitulos) {
-    // Ainda há próximos capítulos no livro atual
+  if (capituloAtual < numCapitulos) {
     btnProximo.textContent = 'Próximo Capítulo';
   } else {
-    // Próximo capítulo está em outro livro
     let proximoLivroIndex = livrosSelect.selectedIndex + 1;
-    let proximoLivro = livrosSelect.options[proximoLivroIndex].value;
-    btnProximo.textContent = `Ler ${proximoLivro}`;
+    let proximoLivro = livrosSelect.options[proximoLivroIndex] ? livrosSelect.options[proximoLivroIndex].value : null;
+    btnProximo.textContent = proximoLivro ? `Ler ${proximoLivro}` : 'Fim da Bíblia';
   }
 
-  let capituloAnterior = capituloAtual - 1;
-  if (capituloAnterior > 0) {
-    // Ainda há capítulos anteriores no livro atual
+  if (capituloAtual > 1) {
     btnAnterior.textContent = 'Capítulo Anterior';
   } else {
-    // Capítulo anterior está em outro livro
     let livroAnteriorIndex = livrosSelect.selectedIndex - 1;
-    if (livroAnteriorIndex >= 0) {
-      let livroAnterior = livrosSelect.options[livroAnteriorIndex].value;
-      btnAnterior.textContent = `Ler ${livroAnterior}`;
-    }
+    let livroAnterior = livrosSelect.options[livroAnteriorIndex] ? livrosSelect.options[livroAnteriorIndex].value : null;
+    btnAnterior.textContent = livroAnterior ? `Ler ${livroAnterior}` : 'Início da Bíblia';
   }
 }
 
 // Carrega a Bíblia ao iniciar a página
-carregarBiblia('KJF.json');
+carregarBiblia('KJF.json'); // Substitua 'KJF.json' pelo nome do seu arquivo JSON
