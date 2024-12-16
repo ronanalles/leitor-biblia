@@ -3,6 +3,7 @@
 <head>
   <title>Leitor da Bíblia</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* Estilos CSS para a aparência do leitor */
     body {
@@ -92,6 +93,16 @@
       background-color: #6c757d; /* Cor cinza para indicar desabilitação */
       cursor: default;
     }
+
+    /* Estilos para telas menores (celulares) */
+    @media (max-width: 600px) {
+      select {
+        width: 100%; /* Ocupa toda a largura disponível em telas pequenas */
+        max-width: none; /* Remove a largura máxima */
+      }
+
+      /* Outros estilos para telas pequenas, se necessário */
+    }
   </style>
 </head>
 <body>
@@ -121,7 +132,6 @@
       <button id="btnAnterior" onclick="capituloAnterior()">Capítulo Anterior</button>
       <button id="btnProximo" onclick="proximoCapitulo()">Próximo Capítulo</button>
     </div>
-
   </div>
 
   <script src="script.js"></script>
