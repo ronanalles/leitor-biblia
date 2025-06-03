@@ -71,8 +71,10 @@ function popularCapitulos() {
       option.text = capitulo;
       capitulosSelect.add(option);
     }
-    capitulosSelect.addEventListener('change', popularVersiculos);
   }
+
+  // Garante que o manipulador de “change” seja registrado apenas uma vez
+  capitulosSelect.onchange = popularVersiculos;
 }
 
 // Função para popular o select de versículos
